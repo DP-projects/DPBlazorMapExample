@@ -1,0 +1,38 @@
+﻿@page "/"
+@using DPBlazorMapLibrary;
+
+<DPBlazorMapLibrary.Map @ref="_map" MapOptions="@_mapOptions" AfterRender="@AfterMapRender"></DPBlazorMapLibrary.Map>
+
+<style>
+    .map{
+        height:100vh;
+        width: 100vw;
+    }
+</style>
+
+@code{
+    private Map _map;
+    private MapOptions _mapOptions;
+
+    [Inject]
+    public IMarkerFactory MarkerFactory { get; init; }
+    [Inject]
+    public ITileLayerFactory TileLayerFactory{ get; init; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _mapOptions = new MapOptions();
+    }
+
+    private async Task AfterMapRender()
+    {
+        
+        await _map.SetView(new LatLng(0, 0));
+        await _map.SetZoom(15);
+
+        var tileLayerOptions = new TileLayerOptions(){ MaxZoom = 18, TileSize = new System.Drawing.Size(512, 512), ZoomOffset=-1};
+        await TileLayerFactory.CreateAndAddToMap("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", _map, tileLayerOptions);
+        await MarkerFactory.CreateAndAddToMap(new LatLng(0, 0), _map, null);
+    }
+}
