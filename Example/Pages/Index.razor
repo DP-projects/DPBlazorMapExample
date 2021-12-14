@@ -11,6 +11,7 @@
 </style>
 
 @code {
+ 
     private Map _map;
     private MapOptions _mapOptions;
 
@@ -121,5 +122,11 @@
             imageOverlayOptions);
 
         await _map.FlyToBounds(imageBounds);
+
+        var path = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "omsk_vodoem.geojson");
+        var json = await File.ReadAllTextAsync(path);
+        var geoJsonObject = GeoJSON.DeserealizeFromString(json);
+
+        var geoJSONOverlay = await LayerFactory.CreateGeoJSONLayerAndAddToMap(geoJsonObject, _map, null);
     }
 }
